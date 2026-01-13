@@ -20,19 +20,9 @@ Package: libsgx-ae-le
 Architecture: amd64
 Description: Intel(R) Software Guard Extensions LE
 
-Package: libsgx-aesm-epid-plugin
-Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, sgx-aesm-service(>= @dep_version@), libsgx-ae-epid(>= @dep_version@), libsgx-aesm-pce-plugin(>= @dep_version@)
-Description: EPID Quote Plugin for Intel(R) Software Guard Extensions AESM Service
-
-Package: libsgx-ae-epid
-Architecture: amd64
-Description: Intel(R) Software Guard Extensions QE and PvE
-
 Package: libsgx-aesm-quote-ex-plugin
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, sgx-aesm-service(>= @dep_version@), libsgx-aesm-ecdsa-plugin(>= @dep_version@)
-Recommends: libsgx-aesm-epid-plugin(>= @dep_version@)
 Description: Unified Quote Plugin for Intel(R) Software Guard Extensions AESM Service
 
 Package: libsgx-aesm-ecdsa-plugin

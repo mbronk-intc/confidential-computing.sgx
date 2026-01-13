@@ -33,13 +33,11 @@
 #include <oal/uae_oal_api.h>
 #include <aesm_error.h>
 #include "sgx_uae_launch.h"
-#include "sgx_uae_epid.h"
 #include "sgx_uae_quote_ex.h"
 #include "uae_service_internal.h"
 #include "config.h"
 
 #include "stdint.h"
-#include "se_sig_rl.h"
 
 #if !defined(ntohl)
 #define ntohl(u32)                                      \
@@ -52,8 +50,7 @@
 
 #define GET_LAUNCH_TOKEN_TIMEOUT_MSEC (IPC_LATENCY)
 #define SE_INIT_QUOTE_TIMEOUT_MSEC (IPC_LATENCY)
-//add 3 millisecond per sig_rl entry
-#define SE_GET_QUOTE_TIMEOUT_MSEC(p_sig_rl) (IPC_LATENCY + ((p_sig_rl) ? 3*ntohl(((const se_sig_rl_t*)p_sig_rl)->sig_rl.n2) : 0))
+#define SE_GET_QUOTE_TIMEOUT_MSEC (IPC_LATENCY)
 #define SE_REPORT_REMOTE_ATTESTATION_FAILURE_TIMEOUT_MSEC  (IPC_LATENCY)
 #define SE_CHECK_UPDATE_STATUS_TIMEOUT_MSEC  (IPC_LATENCY)
 
@@ -110,220 +107,6 @@ sgx_status_t get_launch_token(
 
     return mapped;
 }
-
-sgx_status_t sgx_init_quote(
-    sgx_target_info_t       *p_target_info,
-    sgx_epid_group_id_t     *p_gid)
-{
-    if (p_target_info == NULL || p_gid == NULL)
-        return SGX_ERROR_INVALID_PARAMETER;
-
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-
-    uae_oal_status_t status = oal_init_quote(p_target_info, p_gid, SE_INIT_QUOTE_TIMEOUT_MSEC*1000, &result);
-
-    sgx_status_t mapped = oal_map_status(status);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        /*operation specific mapping */
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-                case AESM_EPIDBLOB_ERROR:
-                    mapped = SGX_ERROR_AE_INVALID_EPIDBLOB;
-                    break;
-                case AESM_EPID_REVOKED_ERROR:
-                    mapped = SGX_ERROR_EPID_MEMBER_REVOKED;
-                    break;
-                case AESM_BACKEND_SERVER_BUSY:
-                    mapped = SGX_ERROR_BUSY;
-                    break;
-                case AESM_SGX_PROVISION_FAILED:
-                    mapped = SGX_ERROR_UNEXPECTED;
-                    break;
-                case AESM_OUT_OF_EPC:
-                    mapped = SGX_ERROR_OUT_OF_EPC;
-                    break;
-                default:
-                    mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
-
-    return mapped;
-}
-
-
-sgx_status_t sgx_get_quote(
-    const sgx_report_t      *p_report,
-    sgx_quote_sign_type_t   quote_type,
-    const sgx_spid_t        *p_spid,
-    const sgx_quote_nonce_t *p_nonce,
-    const uint8_t           *p_sig_rl,
-    uint32_t                sig_rl_size,
-    sgx_report_t            *p_qe_report,
-    sgx_quote_t             *p_quote,
-    uint32_t                quote_size)
-{
-
-    if (p_report == NULL || p_spid == NULL || p_quote == NULL || quote_size == 0 )
-        return SGX_ERROR_INVALID_PARAMETER;
-    if ((p_sig_rl == NULL && sig_rl_size != 0) ||
-        (p_sig_rl != NULL && sig_rl_size == 0) )
-        return SGX_ERROR_INVALID_PARAMETER;
-
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-
-    uae_oal_status_t status = oal_get_quote(p_report, quote_type, p_spid, p_nonce, p_sig_rl, sig_rl_size, p_qe_report,
-                                            p_quote, quote_size, SE_GET_QUOTE_TIMEOUT_MSEC(p_sig_rl)*1000, &result);
-
-    sgx_status_t mapped = oal_map_status(status);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        /*operation specific mapping */
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-                case AESM_EPIDBLOB_ERROR:
-                    mapped = SGX_ERROR_AE_INVALID_EPIDBLOB;
-                    break;
-                case AESM_EPID_REVOKED_ERROR:
-                    mapped = SGX_ERROR_EPID_MEMBER_REVOKED;
-                    break;
-                case AESM_BACKEND_SERVER_BUSY:
-                    mapped = SGX_ERROR_BUSY;
-                    break;
-                case AESM_SGX_PROVISION_FAILED:
-                    mapped = SGX_ERROR_UNEXPECTED;
-                    break;
-                case AESM_OUT_OF_EPC:
-                    mapped = SGX_ERROR_OUT_OF_EPC;
-                    break;
-                default:
-                    mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
-
-    return mapped;
-
-}
-
-sgx_status_t sgx_report_attestation_status(
-    const sgx_platform_info_t*  p_platform_info,
-    int                         attestation_status,
-    sgx_update_info_bit_t*          p_update_info)
-{
-    if (p_platform_info == NULL || p_update_info == NULL)
-        return SGX_ERROR_INVALID_PARAMETER;
-
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-
-    uae_oal_status_t status = oal_report_attestation_status(p_platform_info, attestation_status, p_update_info, SE_REPORT_REMOTE_ATTESTATION_FAILURE_TIMEOUT_MSEC*1000, &result);
-
-    sgx_status_t mapped = oal_map_status(status);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        /*operation specific mapping */
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-                case AESM_BACKEND_SERVER_BUSY:
-                    mapped = SGX_ERROR_BUSY;
-                    break;
-                case AESM_PLATFORM_INFO_BLOB_INVALID_SIG:
-                    mapped = SGX_ERROR_INVALID_PARAMETER;
-                    break;
-                case AESM_EPIDBLOB_ERROR:
-                    mapped = SGX_ERROR_AE_INVALID_EPIDBLOB;
-                    break;
-                case AESM_OUT_OF_EPC:
-                    mapped = SGX_ERROR_OUT_OF_EPC;
-                    break;
-                case AESM_SGX_PROVISION_FAILED:
-                default:
-                    mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
-
-    return mapped;
-}
-
-#define CHECK_UPDATE_STATUS_EPID_PROV		0x2
-#define CHECK_UPDATE_STATUS_CERT_PROV_LTP	0x4
-sgx_status_t SGXAPI sgx_check_update_status(
-    const sgx_platform_info_t* p_platform_info,
-    sgx_update_info_bit_t* p_update_info,
-    uint32_t config,
-    uint32_t* p_status)
-{
-    if ((NULL == p_platform_info && NULL != p_update_info) ||  // can't determine update status w/o PIB
-        (NULL == p_platform_info && 0 == config)) {  // nothing to do without platform info
-        return SGX_ERROR_INVALID_PARAMETER;
-    }
-
-    if (0 != (config & ~(CHECK_UPDATE_STATUS_EPID_PROV | CHECK_UPDATE_STATUS_CERT_PROV_LTP))) { // any unsupported bits in config input
-        return SGX_ERROR_UNSUPPORTED_CONFIG;
-    }
-
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-
-    uae_oal_status_t status = oal_check_update_status(p_platform_info, p_update_info, config, p_status,
-        SE_CHECK_UPDATE_STATUS_TIMEOUT_MSEC*1000, &result);
-
-    sgx_status_t mapped = oal_map_status(status);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        /*operation specific mapping */
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-                case AESM_BACKEND_SERVER_BUSY:
-                    mapped = SGX_ERROR_BUSY;
-                    break;
-                case AESM_PLATFORM_INFO_BLOB_INVALID_SIG:
-                    mapped = SGX_ERROR_INVALID_PARAMETER;
-                    break;
-                case AESM_EPIDBLOB_ERROR:
-                    mapped = SGX_ERROR_AE_INVALID_EPIDBLOB;
-                    break;
-                case AESM_OUT_OF_EPC:
-                    mapped = SGX_ERROR_OUT_OF_EPC;
-                    break;
-                case AESM_CONFIG_UNSUPPORTED:
-                    mapped = SGX_ERROR_UNSUPPORTED_CONFIG;
-                    break;
-                case AESM_SGX_PROVISION_FAILED:
-                default:
-                    mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
-
-    return mapped;
-}
-
 
 sgx_status_t sgx_get_whitelist_size(
     uint32_t* p_whitelist_size)
@@ -389,64 +172,6 @@ sgx_status_t sgx_get_whitelist(
         }
     }
 
-    return mapped;
-}
-
-sgx_status_t sgx_get_extended_epid_group_id(
-    uint32_t* p_extended_epid_group_id)
-{
-    if (p_extended_epid_group_id == NULL)
-        return SGX_ERROR_INVALID_PARAMETER;
-
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-    uae_oal_status_t ret = UAE_OAL_ERROR_UNEXPECTED;
-    ret = oal_get_extended_epid_group_id(p_extended_epid_group_id, SGX_GET_EXTENDED_GROUP_ID_MSEC*1000, &result);
-
-    //common mappings
-    sgx_status_t mapped = oal_map_status(ret);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        //operation specific mapping
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-            default:
-                mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
-    return mapped;
-}
-
-sgx_status_t sgx_switch_extended_epid_group(uint32_t extended_epid_group_id)
-{
-    aesm_error_t    result = AESM_UNEXPECTED_ERROR;
-    uae_oal_status_t ret = UAE_OAL_ERROR_UNEXPECTED;
-    ret = oal_switch_extended_epid_group(extended_epid_group_id, SGX_SWITCH_EXTENDED_GROUP_MSEC*1000, &result);
-
-    //common mappings
-    sgx_status_t mapped = oal_map_status(ret);
-    if (mapped != SGX_SUCCESS)
-        return mapped;
-
-    mapped = oal_map_result(result);
-    if (mapped != SGX_SUCCESS)
-    {
-        //operation specific mapping
-        if (mapped == SGX_ERROR_UNEXPECTED && result != AESM_UNEXPECTED_ERROR)
-        {
-            switch (result)
-            {
-            default:
-                mapped = SGX_ERROR_UNEXPECTED;
-            }
-        }
-    }
     return mapped;
 }
 
@@ -644,7 +369,7 @@ sgx_status_t SGXAPI  sgx_get_quote_ex(const sgx_report_t *p_app_report,
     aesm_error_t    result = AESM_UNEXPECTED_ERROR;
     uae_oal_status_t oal_ret = UAE_OAL_ERROR_UNEXPECTED;
     oal_ret = oal_get_quote_ex(p_app_report, (sgx_att_key_id_t*)p_att_key_id, p_qe_report_info, quote_size, p_quote,
-            SE_GET_QUOTE_TIMEOUT_MSEC(NULL)*1000, &result);
+            SE_GET_QUOTE_TIMEOUT_MSEC * 1000, &result);
 
     //common mappings
     sgx_status_t mapped = oal_map_status(oal_ret);

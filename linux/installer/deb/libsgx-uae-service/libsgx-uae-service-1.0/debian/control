@@ -8,5 +8,5 @@ Homepage: https://github.com/intel/linux-sgx
 
 Package: libsgx-uae-service
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsgx-epid (>= @dep_version@), libsgx-launch (>= @dep_version@), libsgx-quote-ex (>= @dep_version@)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsgx-launch (>= @dep_version@), libsgx-quote-ex (>= @dep_version@)
 Description: Intel(R) Software Guard Extensions Untrusted AE Service

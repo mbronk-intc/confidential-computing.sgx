@@ -45,11 +45,10 @@ CreateBundle(${bundle} ${_srcs} ${Edger8rOutputLE})
 target_include_directories(${bundle} PRIVATE
 	${PROJECT_SOURCE_DIR}/common
 	${SGX_HEADER_DIR}
+	${PROJECT_SOURCE_DIR}/../../../../common/inc
 	${PROJECT_SOURCE_DIR}/../../../../common/inc/internal
 	${PROJECT_SOURCE_DIR}/../../inc
 	${PROJECT_SOURCE_DIR}/../../inc/internal
-	${PROJECT_SOURCE_DIR}/../../../../external/epid-sdk
-	${PROJECT_SOURCE_DIR}/../../../../external/ippcp_internal/inc
 )
 
 add_custom_command(

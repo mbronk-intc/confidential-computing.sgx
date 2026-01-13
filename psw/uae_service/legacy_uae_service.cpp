@@ -31,7 +31,6 @@
 
 #include <dlfcn.h>
 #include "sgx_uae_launch.h"
-#include "sgx_uae_epid.h"
 #include "sgx_uae_quote_ex.h"
 #include "uae_service_internal.h"
 
@@ -124,17 +123,6 @@ public:
 
 #define MAJOR_VER "1"
 
-const static char EPID_LIB[] = _CONCAT("libsgx_epid.so.", MAJOR_VER);
-
-class EPIDLib:public SharedLibProxy<EPIDLib>
-{
-protected:	
-    const char* GetLibraryPath(void) const
-	{
-		return EPID_LIB;
-	};
-};
-
 const static char LAUNCH_LIB[] = _CONCAT("libsgx_launch.so.", MAJOR_VER);
 
 class LaunchLib:public SharedLibProxy<LaunchLib>
@@ -175,115 +163,6 @@ sgx_status_t get_launch_token(
     return SGX_ERROR_SERVICE_UNAVAILABLE;
 }
 
-sgx_status_t sgx_init_quote(
-    sgx_target_info_t       *p_target_info,
-    sgx_epid_group_id_t     *p_gid)
-{
-	sgx_status_t (*p_sgx_init_quote)(
-		sgx_target_info_t       *p_target_info,
-		sgx_epid_group_id_t     *p_gid) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_init_quote))
-    {
-        return p_sgx_init_quote(p_target_info, p_gid);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t sgx_calc_quote_size(
-    const uint8_t *p_sig_rl,
-    uint32_t sig_rl_size,
-    uint32_t* p_quote_size)
-{
-	sgx_status_t (*p_sgx_calc_quote_size)(
-		const uint8_t *p_sig_rl,
-		uint32_t sig_rl_size,
-		uint32_t* p_quote_size) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_calc_quote_size))
-    {
-        return p_sgx_calc_quote_size(p_sig_rl, sig_rl_size, p_quote_size);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t sgx_get_quote_size(
-    const uint8_t *p_sig_rl,
-    uint32_t* p_quote_size)
-{
-	sgx_status_t (*p_sgx_get_quote_size)(
-		const uint8_t *p_sig_rl,
-		uint32_t* p_quote_size) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_get_quote_size))
-    {
-        return p_sgx_get_quote_size(p_sig_rl, p_quote_size);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t sgx_get_quote(
-    const sgx_report_t      *p_report,
-    sgx_quote_sign_type_t   quote_type,
-    const sgx_spid_t        *p_spid,
-    const sgx_quote_nonce_t *p_nonce,
-    const uint8_t           *p_sig_rl,
-    uint32_t                sig_rl_size,
-    sgx_report_t            *p_qe_report,
-    sgx_quote_t             *p_quote,
-    uint32_t                quote_size)
-{
-
-	sgx_status_t (*p_sgx_get_quote)(
-		const sgx_report_t      *p_report,
-		sgx_quote_sign_type_t   quote_type,
-		const sgx_spid_t        *p_spid,
-		const sgx_quote_nonce_t *p_nonce,
-		const uint8_t           *p_sig_rl,
-		uint32_t                sig_rl_size,
-		sgx_report_t            *p_qe_report,
-		sgx_quote_t             *p_quote,
-		uint32_t                quote_size) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_get_quote))
-    {
-        return p_sgx_get_quote(p_report, quote_type, p_spid, p_nonce, p_sig_rl, sig_rl_size, p_qe_report,
-                                            p_quote, quote_size);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-
-sgx_status_t sgx_report_attestation_status(
-    const sgx_platform_info_t*  p_platform_info,
-    int                         attestation_status,
-    sgx_update_info_bit_t*          p_update_info)
-{
-	sgx_status_t (*p_sgx_report_attestation_status)(
-		const sgx_platform_info_t*  p_platform_info,
-		int                         attestation_status,
-		sgx_update_info_bit_t*          p_update_info) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_report_attestation_status))
-    {
-        return p_sgx_report_attestation_status(p_platform_info, attestation_status, p_update_info);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t SGXAPI sgx_check_update_status(
-    const sgx_platform_info_t* p_platform_info,
-    sgx_update_info_bit_t* p_update_info,
-    uint32_t config,
-    uint32_t* p_status)
-{
-	sgx_status_t (*p_sgx_check_update_status)(
-		const sgx_platform_info_t* p_platform_info,
-		sgx_update_info_bit_t* p_update_info,
-		uint32_t config,
-		uint32_t* p_status) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_check_update_status))
-    {
-        return p_sgx_check_update_status(p_platform_info, p_update_info, config, p_status);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
 
 sgx_status_t sgx_get_whitelist_size(
     uint32_t* p_whitelist_size)
@@ -308,28 +187,6 @@ sgx_status_t sgx_get_whitelist(
     if (LaunchLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_get_whitelist))
     {
         return p_sgx_get_whitelist(p_whitelist, whitelist_size);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t sgx_get_extended_epid_group_id(
-    uint32_t* p_extended_epid_group_id)
-{
-	sgx_status_t (*p_sgx_get_extended_epid_group_id)(
-		uint32_t* p_extended_epid_group_id) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_get_extended_epid_group_id))
-    {
-        return p_sgx_get_extended_epid_group_id(p_extended_epid_group_id);
-    }
-    return SGX_ERROR_SERVICE_UNAVAILABLE;
-}
-
-sgx_status_t sgx_switch_extended_epid_group(uint32_t extended_epid_group_id)
-{
-	sgx_status_t (*p_sgx_switch_extended_epid_group)(uint32_t extended_epid_group_id) = NULL;
-    if (EPIDLib::instance().findSymbol(__FUNCTION__, (void**)&p_sgx_switch_extended_epid_group))
-    {
-        return p_sgx_switch_extended_epid_group(extended_epid_group_id);
     }
     return SGX_ERROR_SERVICE_UNAVAILABLE;
 }

@@ -48,7 +48,6 @@
 
 #include "sgx_quote.h"
 #include "launch_service.h"
-#include "epid_quote_service.h"
 #include "quote_proxy_service.h"
 #include "pce_service.h"
 #include "network_service.h"
@@ -368,91 +367,6 @@ aesm_error_t AESMLogicWrapper::get_quote_ex(
     return result;
 }
 
-aesm_error_t AESMLogicWrapper::initQuote(uint8_t **target_info,
-                                         uint32_t *target_info_length,
-                                         uint8_t **gid,
-                                         uint32_t *gid_length)
-{
-    uint8_t *output_target_info = new uint8_t[sizeof(sgx_target_info_t)]();
-    uint8_t *output_gid = new uint8_t[sizeof(sgx_epid_group_id_t)]();
-    uint32_t output_target_info_length = sizeof(sgx_target_info_t);
-    uint32_t output_gid_length = sizeof(sgx_epid_group_id_t);
-    aesm_error_t result = AESM_SERVICE_UNAVAILABLE;
-
-    std::shared_ptr<IEpidQuoteService> service;
-    if (!intall_and_get_service(service))
-    {
-        delete[] output_target_info;
-        delete[] output_gid;
-        return AESM_SERVICE_UNAVAILABLE;
-    }
-
-    result = service->init_quote(output_target_info, output_target_info_length, output_gid, output_gid_length);
-    if (result == AESM_SUCCESS)
-    {
-        *target_info = output_target_info;
-        *target_info_length = output_target_info_length;
-
-        *gid = output_gid;
-        *gid_length = output_gid_length;
-    }
-    else
-    {
-        delete[] output_target_info;
-        delete[] output_gid;
-    }
-    return result;
-}
-
-aesm_error_t AESMLogicWrapper::getQuote(uint32_t reportLength, const uint8_t *report,
-                                        uint32_t quoteType,
-                                        uint32_t spidLength, const uint8_t *spid,
-                                        uint32_t nonceLength, const uint8_t *nonce,
-                                        uint32_t sig_rlLength, const uint8_t *sig_rl,
-                                        uint32_t bufferSize, uint8_t **quote,
-                                        bool b_qe_report, uint32_t *qe_reportSize, uint8_t **qe_report)
-{
-    uint8_t *output_quote = new uint8_t[bufferSize]();
-    uint8_t *output_qe_report = NULL;
-    uint32_t output_qe_reportSize = 0;
-    if (b_qe_report)
-    {
-        output_qe_report = new uint8_t[sizeof(sgx_report_t)]();
-        output_qe_reportSize = sizeof(sgx_report_t);
-    }
-    aesm_error_t result = AESM_SERVICE_UNAVAILABLE;
-    std::shared_ptr<IEpidQuoteService> service;
-    if (!intall_and_get_service(service))
-    {
-        delete[] output_quote;
-        if (output_qe_report)
-            delete[] output_qe_report;
-        return AESM_SERVICE_UNAVAILABLE;
-    }
-
-    result = service->get_quote(report, reportLength,
-                                quoteType,
-                                spid, spidLength,
-                                nonce, nonceLength,
-                                sig_rl, sig_rlLength,
-                                output_qe_report, output_qe_reportSize,
-                                output_quote, bufferSize);
-    if (result == AESM_SUCCESS)
-    {
-        *quote = output_quote;
-
-        *qe_report = output_qe_report;
-        *qe_reportSize = output_qe_reportSize;
-    }
-    else
-    {
-        delete[] output_quote;
-        if (output_qe_report)
-            delete[] output_qe_report;
-    }
-    return result;
-}
-
 aesm_error_t AESMLogicWrapper::getLaunchToken(const uint8_t *measurement,
                                               uint32_t measurement_size,
                                               const uint8_t *mrsigner,
@@ -490,67 +404,6 @@ aesm_error_t AESMLogicWrapper::getLaunchToken(const uint8_t *measurement,
         delete[] output_launch_token;
     }
     return result;
-}
-
-aesm_error_t AESMLogicWrapper::reportAttestationStatus(uint8_t *platform_info, uint32_t platform_info_size,
-                                                       uint32_t attestation_error_code,
-                                                       uint8_t **update_info, uint32_t update_info_size)
-
-{
-    uint8_t *output_update_info = new uint8_t[update_info_size]();
-    aesm_error_t result = AESM_SERVICE_UNAVAILABLE;
-    std::shared_ptr<IEpidQuoteService> service;
-    if (!intall_and_get_service(service))
-    {
-        delete[] output_update_info;
-        return AESM_SERVICE_UNAVAILABLE;
-    }
-    result = service->report_attestation_status(platform_info, platform_info_size,
-                                                attestation_error_code,
-                                                output_update_info, update_info_size);
-
-    //update_info is valid when result is AESM_UPDATE_AVAILABLE
-    if (NULL != update_info && (result == AESM_SUCCESS || result == AESM_UPDATE_AVAILABLE))
-    {
-        *update_info = output_update_info;
-    }
-    else
-    {
-        delete[] output_update_info;
-    }
-    return result;
-}
-
-aesm_error_t AESMLogicWrapper::checkUpdateStatus(uint8_t* platform_info, uint32_t platform_info_size,
-	uint8_t** update_info, uint32_t update_info_size,
-	uint32_t config, uint32_t* status)
-
-{
-	aesm_error_t result = AESM_SERVICE_UNAVAILABLE;
-	std::shared_ptr<IEpidQuoteService> service;
-	if (!intall_and_get_service(service))
-	{
-		return AESM_SERVICE_UNAVAILABLE;
-	}
-	uint8_t* output_update_info = NULL;
-	if (update_info != NULL && update_info_size != 0)
-		output_update_info = new uint8_t[update_info_size]();
-
-	result = service->check_update_status(platform_info, platform_info_size,
-		output_update_info, update_info_size,
-		config, status);
-
-	//update_info is valid when result is AESM_UPDATE_AVAILABLE
-	if (NULL != update_info && (result == AESM_SUCCESS || result == AESM_UPDATE_AVAILABLE))
-	{
-		*update_info = output_update_info;
-	}
-	else
-	{
-		if (NULL != output_update_info)
-			delete[] output_update_info;
-	}
-	return result;
 }
 
 aesm_error_t AESMLogicWrapper::getWhiteListSize(uint32_t* white_list_size)
@@ -596,28 +449,6 @@ aesm_error_t AESMLogicWrapper::getWhiteList(uint8_t **white_list,
         delete[] output_white_list;
     }
     return result;
-}
-
-aesm_error_t AESMLogicWrapper::sgxGetExtendedEpidGroupId(uint32_t *x_group_id)
-{
-    std::shared_ptr<IEpidQuoteService> service;
-    if (!intall_and_get_service(service))
-    {
-        return AESM_SERVICE_UNAVAILABLE;
-    }
-
-    return service->get_extended_epid_group_id(x_group_id);
-}
-
-aesm_error_t AESMLogicWrapper::sgxSwitchExtendedEpidGroup(uint32_t x_group_id)
-{
-    std::shared_ptr<IEpidQuoteService> service;
-    if (!intall_and_get_service(service))
-    {
-        return AESM_SERVICE_UNAVAILABLE;
-    }
-
-    return service->switch_extended_epid_group(x_group_id);
 }
 
 aesm_error_t AESMLogicWrapper::sgxRegister(uint8_t *buf, uint32_t buf_size, uint32_t data_type)
@@ -687,16 +518,10 @@ ae_error_t AESMLogicWrapper::service_start()
         g_fw.Start();
         auto bundles = g_fw_ctx.GetBundles();
         // check required attestation bundles
-        bool found_epid = false, found_ecdsa = false;
+        bool found_ecdsa = false;
         for (Bundle &bundle : bundles) {
-            if (bundle.GetSymbolicName() == "epid_quote_service_bundle_name")
-                found_epid = true;
-            else if (bundle.GetSymbolicName() == "ecdsa_quote_service_bundle_name")
+            if (bundle.GetSymbolicName() == "ecdsa_quote_service_bundle_name")
                 found_ecdsa = true;
-        }
-        if (!found_epid && (supported_attestation_types & ATTESTATION_TYPE_EPID)) {
-            AESM_LOG_ERROR("EPID attestation is required but the bundle is not installed.");
-            return AE_FAILURE;
         }
         if (!found_ecdsa && (supported_attestation_types & ATTESTATION_TYPE_ECDSA)) {
             AESM_LOG_ERROR("ECDSA attestation is required but the bundle is not installed.");
@@ -771,7 +596,6 @@ void AESMLogicWrapper::service_stop()
 
 #if !defined(US_BUILD_SHARED_LIBS)
 CPPMICROSERVICES_IMPORT_BUNDLE(pce_service_bundle_name)
-CPPMICROSERVICES_IMPORT_BUNDLE(epid_quote_service_bundle_name)
 CPPMICROSERVICES_IMPORT_BUNDLE(ecdsa_quote_service_bundle_name)
 CPPMICROSERVICES_IMPORT_BUNDLE(le_launch_service_bundle_name)
 CPPMICROSERVICES_IMPORT_BUNDLE(linux_network_service_bundle_name)

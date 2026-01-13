@@ -51,7 +51,7 @@ else
 all: $(CMAKE_RESULT) AESM COPY_AES| $(BUILD_DIR)
 endif #($(BUILD_REF_LE), 1)
 
-# COPY_AES: currently copy le, qe, pve, pce, qe3
+# COPY_AES: currently copy le, pce, qe3
 .PHONY: COPY_AES
 COPY_AES: $(CHECK_PREBUILT) | $(BUILD_DIR)
 	$(CP) data/prebuilt/* $(BUILD_DIR)

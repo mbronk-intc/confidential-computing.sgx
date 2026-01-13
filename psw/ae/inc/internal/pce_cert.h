@@ -32,7 +32,7 @@
 #define _PCE_CERT_H_
 #include "se_types.h"
 #include "sgx_tcrypto.h"
-#include "epid_pve_type.h"
+
 const uint16_t CUR_PCE_ID = 0;
 
 /*crypto_suite*/
@@ -48,5 +48,10 @@ typedef struct _pce_info_t{
     sgx_isv_svn_t pce_isvn;  /*PCE ISVSVN*/
     uint16_t      pce_id;
 }pce_info_t;
+
+typedef struct _psvn_t{
+    sgx_cpu_svn_t    cpu_svn;
+    sgx_isv_svn_t    isv_svn; /*PvE/QE SVN*/
+}psvn_t;
 
 #endif

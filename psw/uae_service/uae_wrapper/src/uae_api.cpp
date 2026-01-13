@@ -33,33 +33,15 @@
 #include <AEServices.h>
 
 #include <stdlib.h>
-#include <AEInitQuoteRequest.h>
-#include <AEInitQuoteResponse.h>
-
-#include <AEGetQuoteRequest.h>
-#include <AEGetQuoteResponse.h>
 
 #include <AEGetLaunchTokenRequest.h>
 #include <AEGetLaunchTokenResponse.h>
-
-
-#include <AEReportAttestationRequest.h>
-#include <AEReportAttestationResponse.h>
-
-#include <AECheckUpdateStatusRequest.h>
-#include <AECheckUpdateStatusResponse.h>
 
 #include <AEGetWhiteListSizeRequest.h>
 #include <AEGetWhiteListSizeResponse.h>
 
 #include <AEGetWhiteListRequest.h>
 #include <AEGetWhiteListResponse.h>
-
-#include <AESGXGetExtendedEpidGroupIdRequest.h>
-#include <AESGXGetExtendedEpidGroupIdResponse.h>
-
-#include <AESGXSwitchExtendedEpidGroupRequest.h>
-#include <AESGXSwitchExtendedEpidGroupResponse.h>
 
 #include <AESGXRegisterRequest.h>
 #include <AESGXRegisterResponse.h>
@@ -87,7 +69,6 @@
 #include <arch.h>
 #include <sgx_urts.h>
 #include <sgx_uae_launch.h>
-#include <sgx_uae_epid.h>
 #include <sgx_uae_quote_ex.h>
 
 
@@ -145,128 +126,6 @@ uae_oal_status_t oal_get_launch_token(const enclave_css_t* signature, const sgx_
 */
 
 extern "C"
-uae_oal_status_t SGXAPI oal_init_quote(sgx_target_info_t *p_target_info, sgx_epid_group_id_t *p_gid, uint32_t timeout_usec, aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices *servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-
-        AEInitQuoteRequest initQuoteRequest(timeout_usec / 1000);
-        AEInitQuoteResponse initQuoteResponse;
-        uae_oal_status_t ret  = servicesProvider->InternalInterface(&initQuoteRequest, &initQuoteResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = initQuoteResponse.GetValues((uint32_t*)result, sizeof(sgx_epid_group_id_t), (uint8_t*)p_gid, sizeof(sgx_target_info_t), (uint8_t*)p_target_info);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-
-}
-
-    extern "C"
-uae_oal_status_t SGXAPI oal_get_quote(
-        const sgx_report_t *p_report,
-    sgx_quote_sign_type_t quote_type,
-    const sgx_spid_t *p_spid,
-    const sgx_quote_nonce_t *p_nonce,
-    const uint8_t *p_sig_rl,
-    uint32_t sig_rl_size,
-    sgx_report_t *p_qe_report,
-    sgx_quote_t *p_quote,
-    uint32_t quote_size,
-    uint32_t timeout_usec,
-    aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices *servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-        AEGetQuoteRequest getQuoteRequest(sizeof(sgx_report_t), (const uint8_t*)p_report,
-            (uint32_t)quote_type,
-            sizeof(sgx_spid_t), (const uint8_t*)p_spid,
-            sizeof(sgx_quote_nonce_t), (const uint8_t*)p_nonce,
-            sig_rl_size, (const uint8_t*)p_sig_rl,
-            quote_size,
-            p_qe_report != NULL,
-            timeout_usec / 1000);
-        AEGetQuoteResponse getQuoteResponse;
-        uae_oal_status_t ret = servicesProvider->InternalInterface(&getQuoteRequest, &getQuoteResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = getQuoteResponse.GetValues((uint32_t*)result, quote_size, (uint8_t*)p_quote, sizeof(sgx_report_t), (uint8_t*)p_qe_report);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-}
-
-
-
-extern "C"
-uae_oal_status_t SGXAPI oal_report_attestation_status(
-    const sgx_platform_info_t* platform_info,
-    int attestation_error_code,
-    sgx_update_info_bit_t* platform_update_info,
-    uint32_t timeout_usec,
-    aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices* servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-
-        AEReportAttestationRequest reportAttestationRequest(sizeof(sgx_platform_info_t), (const uint8_t*)platform_info, (uint32_t)attestation_error_code, sizeof(sgx_update_info_bit_t), timeout_usec / 1000);
-
-        AEReportAttestationResponse reportAttestationResponse;
-        uae_oal_status_t ret = servicesProvider->InternalInterface(&reportAttestationRequest, &reportAttestationResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = reportAttestationResponse.GetValues((uint32_t*)result, sizeof(sgx_update_info_bit_t), (uint8_t*)platform_update_info);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-}
-
-extern "C"
-uae_oal_status_t SGXAPI oal_check_update_status(
-    const sgx_platform_info_t* platform_info,
-    sgx_update_info_bit_t* platform_update_info,
-    uint32_t config,
-    uint32_t* status,
-    uint32_t timeout_usec,
-    aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices* servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-
-        uint32_t platform_info_size = platform_info ? (uint32_t)(sizeof(sgx_platform_info_t)) : 0;
-        uint32_t update_info_size = platform_update_info ? (uint32_t)(sizeof(sgx_update_info_bit_t)) : 0;
-
-        AECheckUpdateStatusRequest checkUpdateStatusRequest(platform_info_size, (const uint8_t*)platform_info,
-          update_info_size, (uint32_t)config, timeout_usec / 1000);
-
-        AECheckUpdateStatusResponse checkUpdateStatusResponse;
-        uae_oal_status_t ret = servicesProvider->InternalInterface(&checkUpdateStatusRequest, &checkUpdateStatusResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = checkUpdateStatusResponse.GetValues((uint32_t*)result, update_info_size, (uint8_t*)platform_update_info,
-              status);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-}
-
-extern "C"
 uae_oal_status_t oal_get_whitelist_size(uint32_t* white_list_size, uint32_t timeout_usec, aesm_error_t *result)
 {
     TRY_CATCH_BAD_ALLOC({
@@ -303,50 +162,6 @@ uae_oal_status_t oal_get_whitelist(uint8_t *white_list, uint32_t white_list_size
         if (ret == UAE_OAL_SUCCESS)
         {
             bool valid = getWhiteListResponse.GetValues((uint32_t*)result, white_list_size, white_list);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-}
-
-extern "C"
-uae_oal_status_t oal_get_extended_epid_group_id(uint32_t* extended_group_id, uint32_t timeout_usec, aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices* servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-
-        AESGXGetExtendedEpidGroupIdRequest getExtendedEpidGroupIdRequest(timeout_usec / 1000);
-
-        AESGXGetExtendedEpidGroupIdResponse getExtendedEpidGroupIdResponse;
-        uae_oal_status_t ret = servicesProvider->InternalInterface(&getExtendedEpidGroupIdRequest, &getExtendedEpidGroupIdResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = getExtendedEpidGroupIdResponse.GetValues((uint32_t*)result, extended_group_id);
-            if (!valid)
-                ret = UAE_OAL_ERROR_UNEXPECTED;
-        }
-        return ret;
-    });
-}
-
-extern "C"
-uae_oal_status_t oal_switch_extended_epid_group(uint32_t x_group_id, uint32_t timeout_usec, aesm_error_t *result)
-{
-    TRY_CATCH_BAD_ALLOC({
-        AEServices* servicesProvider = AEServicesProvider::GetServicesProvider();
-        if (servicesProvider == NULL)
-            return UAE_OAL_ERROR_UNEXPECTED;
-
-        AESGXSwitchExtendedEpidGroupRequest switchExtendedEpidGroupRequest(x_group_id, timeout_usec / 1000);
-
-        AESGXSwitchExtendedEpidGroupResponse switchExtendedEpidGroupResponse;
-        uae_oal_status_t ret = servicesProvider->InternalInterface(&switchExtendedEpidGroupRequest, &switchExtendedEpidGroupResponse, timeout_usec / 1000);
-        if (ret == UAE_OAL_SUCCESS)
-        {
-            bool valid = switchExtendedEpidGroupResponse.GetValues((uint32_t*)result);
             if (!valid)
                 ret = UAE_OAL_ERROR_UNEXPECTED;
         }

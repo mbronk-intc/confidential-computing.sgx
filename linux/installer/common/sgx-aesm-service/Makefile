@@ -53,7 +53,6 @@ endif
 endif
 
 QE_VER=1.0.0
-PVE_VER=1.0.0
 LE_VER=1.0.0
 PCE_VER=1.0.0
 QE3_VER=1.0.0
@@ -79,13 +78,6 @@ install: $(PACKAGES)
 			cp -fr $(DESTDIR)/$(AESM_SERVICE_PACKAGE_NAME)/$(AESM_SERVICE_PACKAGE_PATH)/$(AESM_SERVICE_PACKAGE_NAME)/aesm/conf/* \
 				$(DESTDIR)/$(AESM_SERVICE_PACKAGE_NAME)/$(ETC_DIR) && \
 			rm -fr $(DESTDIR)/$(AESM_SERVICE_PACKAGE_NAME)/$(AESM_SERVICE_PACKAGE_PATH)/$(AESM_SERVICE_PACKAGE_NAME)/aesm/conf))
-	cd $(shell readlink -m $(DESTDIR)/$(AE_EPID_PACKAGE_NAME)/$(AESM_SERVICE_PACKAGE_PATH)/$(AESM_SERVICE_PACKAGE_NAME)/aesm) && \
-	mv libsgx_qe.signed.so libsgx_qe.signed.so.$(QE_VER) && \
-	ln -fs libsgx_qe.signed.so.$(QE_VER) libsgx_qe.signed.so.$(call SPLIT_VERSION,$(QE_VER),1) && \
-	ln -fs libsgx_qe.signed.so.$(call SPLIT_VERSION,$(QE_VER),1) libsgx_qe.signed.so &&\
-	mv libsgx_pve.signed.so libsgx_pve.signed.so.$(PVE_VER) && \
-	ln -fs libsgx_pve.signed.so.$(PVE_VER) libsgx_pve.signed.so.$(call SPLIT_VERSION,$(PVE_VER),1) && \
-	ln -fs libsgx_pve.signed.so.$(call SPLIT_VERSION,$(PVE_VER),1) libsgx_pve.signed.so
 	cd $(shell readlink -m $(DESTDIR)/$(AE_PCE_PACKAGE_NAME)/$(USR_LIB_PATH)) && \
 	mv libsgx_pce.signed.so libsgx_pce.signed.so.$(PCE_VER) && \
 	ln -fs libsgx_pce.signed.so.$(PCE_VER) libsgx_pce.signed.so.$(call SPLIT_VERSION,$(PCE_VER),1) && \

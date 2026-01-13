@@ -50,11 +50,9 @@ source ${SCRIPT_DIR}/installConfig
 cp ${LINUX_INSTALLER_COMMON_DIR}/gen_source/gen_source.py ${SCRIPT_DIR}
 
 # Copy the files according to the BOM
-python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-ae-epid.txt --installdir=pkgroot/libsgx-ae-epid
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-ae-le.txt --cleanup=false --installdir=pkgroot/libsgx-ae-le
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-ae-pce.txt --cleanup=false --installdir=pkgroot/libsgx-ae-pce
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-ecdsa-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-ecdsa-plugin
-python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-epid-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-epid-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-launch-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-launch-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-pce-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-pce-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-quote-ex-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-quote-ex-plugin
@@ -63,15 +61,11 @@ python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/sgx-aesm-service-package.txt --cle
 python ${SCRIPT_DIR}/gen_source.py --bom=../licenses/BOM_license.txt --cleanup=false
 
 # Create the tarball
-QE_VERSION=$(awk '/QE_VERSION/ {print $3}' ${ROOT_DIR}/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
-PVE_VERSION=$(awk '/PVE_VERSION/ {print $3}' ${ROOT_DIR}/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
 LE_VERSION=$(awk '/LE_VERSION/ {print $3}' ${ROOT_DIR}/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
 PCE_VERSION=$(awk '/PCE_VERSION/ {print $3}' ${ROOT_DIR}/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
 URTS_VERSION=$(awk '/URTS_VERSION/ {print $3}' ${ROOT_DIR}/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
 QE3_VERSION=$(awk '/QE3_VERSION/ {print $3}' ${ROOT_DIR}/external/dcap_source/QuoteGeneration/common/inc/internal/se_version.h|sed 's/^\"\(.*\)\"$/\1/')
 pushd ${INSTALL_PATH} &> /dev/null
-sed -i "s/QE_VER=.*/QE_VER=${QE_VERSION}/" Makefile
-sed -i "s/PVE_VER=.*/PVE_VER=${PVE_VERSION}/" Makefile
 sed -i "s/LE_VER=.*/LE_VER=${LE_VERSION}/" Makefile
 sed -i "s/PCE_VER=.*/PCE_VER=${PCE_VERSION}/" Makefile
 sed -i "s/URTS_VER=.*/URTS_VER=${URTS_VERSION}/" Makefile

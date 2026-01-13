@@ -50,19 +50,8 @@ typedef enum _aesm_data_type_t{
 typedef enum _aesm_data_id_t{
     /*first encalve files*/
     LE_ENCLAVE_FID,
-    QE_ENCLAVE_FID,
-    PVE_ENCLAVE_FID,
-    PSE_OP_ENCLAVE_FID,
-    PSE_PR_ENCLAVE_FID,
-    PSE_PR_2_ENCLAVE_FID,
     PCE_ENCLAVE_FID,
     LE_PROD_SIG_STRUCT_FID,
-    /*some normal persistent storages*/
-    EXTENDED_EPID_GROUP_ID_FID,
-    EXTENDED_EPID_GROUP_BLOB_INFO_FID,
-    PROVISION_PEK_BLOB_FID,
-    EPID_DATA_BLOB_FID,
-    AESM_SERVER_URL_FID,
     /*some special files where pathname could be used directly inside AESM*/
     VMC_DATABASE_FID,
     VMC_DATABASE_BK_FID,
@@ -78,22 +67,9 @@ typedef enum _aesm_data_id_t{
 #endif
     AESM_WHITE_LIST_CERT_FID,
     AESM_WHITE_LIST_CERT_TO_BE_VERIFY_FID,
-    PSE_PR_OCSPRESP_FID,
-    PSE_PR_LT_PAIRING_FID,
-    PSE_PR_CERTIFICATE_CHAIN_FID,
-    PSE_PR_CERTIFICATE_FID,
-    PSE_PR_CERTIFICATE_FID2,
-    PSE_PR_CERTIFICATE_FID3,
-    PSE_PR_CERTIFICATE_FID4,
-    PSE_PR_CERTIFICATE_FID5,
-    PSE_PR_CERTIFICATE_FID6,
-    PSE_PR_CERTIFICATE_FID_MAX,
-    PSE_PR_FULLNAME_FID,
 
     NUMBER_OF_FIDS
 } aesm_data_id_t;
-
-aesm_data_id_t operator++(aesm_data_id_t& id, int);
 
 typedef aesm_data_id_t aesm_enclave_id_t;
 #define DEFAULT_EGID 0

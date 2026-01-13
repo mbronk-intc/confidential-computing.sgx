@@ -30,6 +30,8 @@
  */
 
 #include <launch_service.h>
+#include "pce_cert.h"
+#include "byte_order.h"
 
 #include "uae_service_internal.h"
 #include "aesm_logic.h"

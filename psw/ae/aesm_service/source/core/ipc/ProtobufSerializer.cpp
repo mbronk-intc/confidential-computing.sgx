@@ -37,22 +37,12 @@
 #include <IAEMessage.h>
 
 #include <IAERequest.h>
-#include <AEInitQuoteRequest.h>
-
-#include <AEGetQuoteRequest.h>
 
 #include <AEGetLaunchTokenRequest.h>
-#include <AEReportAttestationRequest.h>
-
-#include <AECheckUpdateStatusRequest.h>
 
 #include <AEGetWhiteListSizeRequest.h>
 
 #include <AEGetWhiteListRequest.h>
-
-#include <AESGXGetExtendedEpidGroupIdRequest.h>
-
-#include <AESGXSwitchExtendedEpidGroupRequest.h>
 
 #include <AESGXRegisterRequest.h>
 
@@ -79,22 +69,10 @@ IAERequest* ProtobufSerializer::inflateRequest(AEMessage* message) {
     IAERequest* request = NULL;
     if (reqMsg->has_getlictokenreq() == true)
         request = new AEGetLaunchTokenRequest(reqMsg->getlictokenreq());
-    else if (reqMsg->has_initquotereq() == true)
-        request = new AEInitQuoteRequest(reqMsg->initquotereq());
-    else if (reqMsg->has_getquotereq() == true)
-        request = new AEGetQuoteRequest(reqMsg->getquotereq());
-    else if (reqMsg->has_reporterrreq() == true)
-        request = new AEReportAttestationRequest(reqMsg->reporterrreq());
-    else if (reqMsg->has_checkupdatestatusreq() == true)
-        request = new AECheckUpdateStatusRequest(reqMsg->checkupdatestatusreq());
     else if(reqMsg->has_getwhitelistsizereq() == true)
         request = new AEGetWhiteListSizeRequest(reqMsg->getwhitelistsizereq());
     else if(reqMsg->has_getwhitelistreq() == true)
         request = new AEGetWhiteListRequest(reqMsg->getwhitelistreq());
-    else if(reqMsg->has_sgxgetextendedepidgroupidreq() == true)
-        request = new AESGXGetExtendedEpidGroupIdRequest(reqMsg->sgxgetextendedepidgroupidreq());
-    else if(reqMsg->has_sgxswitchextendedepidgroupreq() == true)
-        request = new AESGXSwitchExtendedEpidGroupRequest(reqMsg->sgxswitchextendedepidgroupreq());
     else if(reqMsg->has_sgxregisterreq() == true)
         request = new AESGXRegisterRequest(reqMsg->sgxregisterreq());
     else if(reqMsg->has_initquoteexreq() == true)

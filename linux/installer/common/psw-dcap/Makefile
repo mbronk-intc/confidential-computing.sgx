@@ -41,12 +41,8 @@ ACQUIRE_DCAP_VERSION = $(shell awk  \
 
 LE_FULL_VER:= $(call ACQUIRE_PSW_VERSION,LE_VERSION)
 LE_MAJOR_VER:=$(word 1,$(subst ., ,$(LE_FULL_VER)))
-QE_FULL_VER:= $(call ACQUIRE_PSW_VERSION,QE_VERSION)
-QE_MAJOR_VER:=$(word 1,$(subst ., ,$(QE_FULL_VER)))
 PCE_FULL_VER:= $(call ACQUIRE_PSW_VERSION,PCE_VERSION)
 PCE_MAJOR_VER:=$(word 1,$(subst ., ,$(PCE_FULL_VER)))
-PVE_FULL_VER:= $(call ACQUIRE_PSW_VERSION,PVE_VERSION)
-PVE_MAJOR_VER:=$(word 1,$(subst ., ,$(PVE_FULL_VER)))
 IDE_FULL_VER:= $(call ACQUIRE_DCAP_VERSION,IDE_VERSION)
 IDE_MAJOR_VER:=$(word 1,$(subst ., ,$(IDE_FULL_VER)))
 QE3_FULL_VER:= $(call ACQUIRE_DCAP_VERSION,QE3_VERSION)
@@ -61,8 +57,6 @@ URTS_FULL_VER:= $(call ACQUIRE_PSW_VERSION,URTS_VERSION)
 URTS_MAJOR_VER:=$(word 1,$(subst ., ,$(URTS_FULL_VER)))
 UAE_SERVICE_FULL_VER:= $(call ACQUIRE_PSW_VERSION,UAE_SERVICE_VERSION)
 UAE_SERVICE_MAJOR_VER:=$(word 1,$(subst ., ,$(UAE_SERVICE_FULL_VER)))
-EPID_FULL_VER:= $(call ACQUIRE_PSW_VERSION,EPID_VERSION)
-EPID_MAJOR_VER:=$(word 1,$(subst ., ,$(EPID_FULL_VER)))
 LAUNCH_FULL_VER:= $(call ACQUIRE_PSW_VERSION,LAUNCH_VERSION)
 LAUNCH_MAJOR_VER:=$(word 1,$(subst ., ,$(LAUNCH_FULL_VER)))
 QUOTE_EX_FULL_VER:= $(call ACQUIRE_PSW_VERSION,QUOTE_EX_VERSION)
@@ -151,7 +145,6 @@ post_$(1): $(1) | $(PACKAGE_ROOT_PATH)
 endef
 
 AESM_SERVICE_PKGS:= $(AESM_PCE_PACKAGE)      \
-                    $(AESM_EPID_PACKAGE)     \
                     $(AESM_ECDSA_PACKAGE)    \
                     $(AESM_LAUNCH_PACKAGE)   \
                     $(AESM_QUOTE_EX_PACKAGE) \
@@ -159,16 +152,13 @@ AESM_SERVICE_PKGS:= $(AESM_PCE_PACKAGE)      \
                     $(QE3_LOGIC_PACKAGE)     \
                     $(PCE_LOGIC_PACKAGE)
 
-AE_PKGS:= $(AE_EPID_PACKAGE)                 \
-          $(AE_IDE_PACKAGE)                  \
+AE_PKGS:= $(AE_IDE_PACKAGE)                  \
           $(AE_LE_PACKAGE)                   \
           $(AE_PCE_PACKAGE)                  \
           $(AE_QE3_PACKAGE)                  \
           $(AE_QVE_PACKAGE)
 
-DEV_LIB_PKGS:= $(EPID_PACKAGE)               \
-               $(EPID_DEV_PACKAGE)           \
-               $(LAUNCH_PACKAGE)             \
+DEV_LIB_PKGS:= $(LAUNCH_PACKAGE)             \
                $(LAUNCH_DEV_PACKAGE)         \
                $(QUOTE_EX_PACKAGE)           \
                $(QUOTE_EX_DEV_PACKAGE)       \
@@ -257,13 +247,6 @@ install_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE): pre_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE) |
 
 PHONY+=install_ae
 install_ae: $(foreach PKG,$(AE_PKGS),post_$(PKG))
-	cd $(shell readlink -m $(DESTDIR)/$(AE_EPID_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm) && \
-	mv libsgx_qe.signed.so libsgx_qe.signed.so.$(QE_FULL_VER)                                              && \
-	ln -fs libsgx_qe.signed.so.$(QE_FULL_VER) libsgx_qe.signed.so.$(QE_MAJOR_VER)                          && \
-	ln -fs libsgx_qe.signed.so.$(QE_MAJOR_VER) libsgx_qe.signed.so                                         && \
-	mv libsgx_pve.signed.so libsgx_pve.signed.so.$(PVE_FULL_VER)                                           && \
-	ln -fs libsgx_pve.signed.so.$(PVE_FULL_VER) libsgx_pve.signed.so.$(PVE_MAJOR_VER)                      && \
-	ln -fs libsgx_pve.signed.so.$(PVE_MAJOR_VER) libsgx_pve.signed.so
 	cd $(shell readlink -m $(DESTDIR)/$(AE_LE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm)   && \
 	mv libsgx_le.signed.so libsgx_le.signed.so.$(LE_FULL_VER)                                              && \
 	ln -fs libsgx_le.signed.so.$(LE_FULL_VER) libsgx_le.signed.so.$(LE_MAJOR_VER)                          && \
@@ -291,11 +274,6 @@ install_ae: $(foreach PKG,$(AE_PKGS),post_$(PKG))
 PHONY+=install_dev_lib
 install_dev_lib: $(foreach PKG,$(DEV_LIB_PKGS),post_$(PKG))
 	rm -fr $(shell readlink -m $(DESTDIR)/$(SGX_HEADERS_PACKAGE)/$(USR_LIB_PATH))
-	cd $(shell readlink -m $(DESTDIR)/$(EPID_PACKAGE)/$(USR_LIB_PATH))     && \
-	mv libsgx_epid.so libsgx_epid.so.$(EPID_FULL_VER)                      && \
-	ln -fs libsgx_epid.so.$(EPID_FULL_VER) libsgx_epid.so.$(EPID_MAJOR_VER)
-	cd $(shell readlink -m $(DESTDIR)/$(EPID_DEV_PACKAGE)/$(USR_LIB_PATH)) && \
-	ln -fs libsgx_epid.so.$(EPID_MAJOR_VER) libsgx_epid.so
 	cd $(shell readlink -m $(DESTDIR)/$(LAUNCH_PACKAGE)/$(USR_LIB_PATH))     && \
 	mv libsgx_launch.so libsgx_launch.so.$(LAUNCH_FULL_VER)                  && \
 	ln -fs libsgx_launch.so.$(LAUNCH_FULL_VER) libsgx_launch.so.$(LAUNCH_MAJOR_VER)

@@ -37,7 +37,6 @@
 #include "sgx_utils.h"
 #include "sgx_lfence.h"
 #include "byte_order.h"
-#include "pve_qe_common.h"
 #include "arch.h"
 #include <assert.h>
 
