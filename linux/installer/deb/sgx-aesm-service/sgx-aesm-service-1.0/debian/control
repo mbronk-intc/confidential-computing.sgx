@@ -11,15 +11,6 @@ Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Intel(R) Software Guard Extensions AESM Service
 
-Package: libsgx-aesm-launch-plugin
-Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, sgx-aesm-service(>= @dep_version@), libsgx-ae-le(>= @dep_version@)
-Description: Launch Plugin for Intel(R) Software Guard Extensions AESM Service
-
-Package: libsgx-ae-le
-Architecture: amd64
-Description: Intel(R) Software Guard Extensions LE
-
 Package: libsgx-aesm-quote-ex-plugin
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, sgx-aesm-service(>= @dep_version@), libsgx-aesm-ecdsa-plugin(>= @dep_version@)

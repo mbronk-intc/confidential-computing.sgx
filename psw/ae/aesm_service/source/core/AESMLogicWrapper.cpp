@@ -597,6 +597,5 @@ void AESMLogicWrapper::service_stop()
 #if !defined(US_BUILD_SHARED_LIBS)
 CPPMICROSERVICES_IMPORT_BUNDLE(pce_service_bundle_name)
 CPPMICROSERVICES_IMPORT_BUNDLE(ecdsa_quote_service_bundle_name)
-CPPMICROSERVICES_IMPORT_BUNDLE(le_launch_service_bundle_name)
 CPPMICROSERVICES_IMPORT_BUNDLE(linux_network_service_bundle_name)
 #endif

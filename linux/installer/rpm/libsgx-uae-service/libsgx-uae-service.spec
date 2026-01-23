@@ -36,7 +36,7 @@ Version:        @version@
 Release:        1%{?dist}
 Summary:        Intel(R) Software Guard Extensions Untrusted AE Service
 Group:          Development/Libraries
-Requires:       libsgx-launch >= %{version}-%{release} libsgx-quote-ex >= %{version}-%{release}
+Requires:       libsgx-quote-ex >= %{version}-%{release}
 
 License:        BSD License
 URL:            https://github.com/intel/linux-sgx

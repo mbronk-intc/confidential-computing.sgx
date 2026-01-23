@@ -50,10 +50,8 @@ source ${SCRIPT_DIR}/installConfig
 cp ${LINUX_INSTALLER_COMMON_DIR}/gen_source/gen_source.py ${SCRIPT_DIR}
 
 # Copy the files according to the BOM
-python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-ae-le.txt --cleanup=false --installdir=pkgroot/libsgx-ae-le
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-ae-pce.txt --cleanup=false --installdir=pkgroot/libsgx-ae-pce
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-ecdsa-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-ecdsa-plugin
-python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-launch-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-launch-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-pce-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-pce-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/libsgx-aesm-quote-ex-plugin.txt --cleanup=false --installdir=pkgroot/libsgx-aesm-quote-ex-plugin
 python ${SCRIPT_DIR}/gen_source.py --bom=BOMs/sgx-aesm-service.txt --cleanup=false --installdir=pkgroot/sgx-aesm-service

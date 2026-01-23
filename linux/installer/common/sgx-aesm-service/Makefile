@@ -82,10 +82,6 @@ install: $(PACKAGES)
 	mv libsgx_pce.signed.so libsgx_pce.signed.so.$(PCE_VER) && \
 	ln -fs libsgx_pce.signed.so.$(PCE_VER) libsgx_pce.signed.so.$(call SPLIT_VERSION,$(PCE_VER),1) && \
 	ln -fs libsgx_pce.signed.so.$(call SPLIT_VERSION,$(PCE_VER),1) libsgx_pce.signed.so
-	cd $(shell readlink -m $(DESTDIR)/$(AE_LE_PACKAGE_NAME)/$(AESM_SERVICE_PACKAGE_PATH)/$(AESM_SERVICE_PACKAGE_NAME)/aesm) && \
-	mv libsgx_le.signed.so libsgx_le.signed.so.$(LE_VER) && \
-	ln -fs libsgx_le.signed.so.$(LE_VER) libsgx_le.signed.so.$(call SPLIT_VERSION,$(LE_VER),1) && \
-	ln -fs libsgx_le.signed.so.$(call SPLIT_VERSION,$(LE_VER),1) libsgx_le.signed.so
 	cd $(shell readlink -m $(DESTDIR)/$(AESM_ECDSA_PACKAGE_NAME)/$(AESM_SERVICE_PACKAGE_PATH)/$(AESM_SERVICE_PACKAGE_NAME)/aesm) && \
 	ln -fs $(USR_LIB_PATH)/libsgx_qe3.signed.so.$(call SPLIT_VERSION,$(QE3_VER),1) && \
 	ln -fs $(USR_LIB_PATH)/libsgx_qe3.signed.so && \

@@ -49,14 +49,8 @@ typedef enum _aesm_data_type_t{
 /*please refer to persistent_storage_table.cpp for more detail information about persistent storages*/
 typedef enum _aesm_data_id_t{
     /*first encalve files*/
-    LE_ENCLAVE_FID,
     PCE_ENCLAVE_FID,
-    LE_PROD_SIG_STRUCT_FID,
     /*some special files where pathname could be used directly inside AESM*/
-    VMC_DATABASE_FID,
-    VMC_DATABASE_BK_FID,
-    VMC_DATABASE_PREBUILD_FID,
-    PSDA_FID,
     NETWORK_SETTING_FID,
 #ifdef DBG_LOG
     AESM_DBG_LOG_FID,
@@ -65,8 +59,6 @@ typedef enum _aesm_data_id_t{
 #ifdef _PROFILE_
     AESM_PERF_DATA_FID,
 #endif
-    AESM_WHITE_LIST_CERT_FID,
-    AESM_WHITE_LIST_CERT_TO_BE_VERIFY_FID,
 
     NUMBER_OF_FIDS
 } aesm_data_id_t;

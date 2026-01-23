@@ -146,21 +146,17 @@ endef
 
 AESM_SERVICE_PKGS:= $(AESM_PCE_PACKAGE)      \
                     $(AESM_ECDSA_PACKAGE)    \
-                    $(AESM_LAUNCH_PACKAGE)   \
                     $(AESM_QUOTE_EX_PACKAGE) \
                     $(AESM_SERVICE_PACKAGE)  \
                     $(QE3_LOGIC_PACKAGE)     \
                     $(PCE_LOGIC_PACKAGE)
 
 AE_PKGS:= $(AE_IDE_PACKAGE)                  \
-          $(AE_LE_PACKAGE)                   \
           $(AE_PCE_PACKAGE)                  \
           $(AE_QE3_PACKAGE)                  \
           $(AE_QVE_PACKAGE)
 
-DEV_LIB_PKGS:= $(LAUNCH_PACKAGE)             \
-               $(LAUNCH_DEV_PACKAGE)         \
-               $(QUOTE_EX_PACKAGE)           \
+DEV_LIB_PKGS:= $(QUOTE_EX_PACKAGE)           \
                $(QUOTE_EX_DEV_PACKAGE)       \
                $(ENCLAVE_COMMON_PACKAGE)     \
                $(ENCLAVE_COMMON_DEV_PACKAGE) \
@@ -247,10 +243,6 @@ install_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE): pre_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE) |
 
 PHONY+=install_ae
 install_ae: $(foreach PKG,$(AE_PKGS),post_$(PKG))
-	cd $(shell readlink -m $(DESTDIR)/$(AE_LE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm)   && \
-	mv libsgx_le.signed.so libsgx_le.signed.so.$(LE_FULL_VER)                                              && \
-	ln -fs libsgx_le.signed.so.$(LE_FULL_VER) libsgx_le.signed.so.$(LE_MAJOR_VER)                          && \
-	ln -fs libsgx_le.signed.so.$(LE_MAJOR_VER) libsgx_le.signed.so
 	cd $(shell readlink -m $(DESTDIR)/$(AE_PCE_PACKAGE)/$(USR_LIB_PATH))                                   && \
 	mv libsgx_pce.signed.so libsgx_pce.signed.so.$(PCE_FULL_VER)                                           && \
 	ln -fs libsgx_pce.signed.so.$(PCE_FULL_VER) libsgx_pce.signed.so.$(PCE_MAJOR_VER)                      && \
@@ -274,11 +266,6 @@ install_ae: $(foreach PKG,$(AE_PKGS),post_$(PKG))
 PHONY+=install_dev_lib
 install_dev_lib: $(foreach PKG,$(DEV_LIB_PKGS),post_$(PKG))
 	rm -fr $(shell readlink -m $(DESTDIR)/$(SGX_HEADERS_PACKAGE)/$(USR_LIB_PATH))
-	cd $(shell readlink -m $(DESTDIR)/$(LAUNCH_PACKAGE)/$(USR_LIB_PATH))     && \
-	mv libsgx_launch.so libsgx_launch.so.$(LAUNCH_FULL_VER)                  && \
-	ln -fs libsgx_launch.so.$(LAUNCH_FULL_VER) libsgx_launch.so.$(LAUNCH_MAJOR_VER)
-	cd $(shell readlink -m $(DESTDIR)/$(LAUNCH_DEV_PACKAGE)/$(USR_LIB_PATH)) && \
-	ln -fs libsgx_launch.so.$(LAUNCH_MAJOR_VER) libsgx_launch.so
 	cd $(shell readlink -m $(DESTDIR)/$(QUOTE_EX_PACKAGE)/$(USR_LIB_PATH))     && \
 	mv libsgx_quote_ex.so libsgx_quote_ex.so.$(QUOTE_EX_FULL_VER)              && \
 	ln -fs libsgx_quote_ex.so.$(QUOTE_EX_FULL_VER) libsgx_quote_ex.so.$(QUOTE_EX_MAJOR_VER)
