@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   build:
+    name: "SGX SDK build"
     runs-on: ${{ vars.RUNNER_CI_BUILD || 'ubuntu-latest' }}
 
     steps:
@@ -27,7 +28,7 @@ jobs:
         submodules: recursive
         token: ${{ secrets.ALL_REPO_CONTENTS_READ_PAT || github.token }}
 
-    - name: install build prerequisites
+    - name: Install build prerequisites
       shell: bash
       run: |
         set -xeuo pipefail
@@ -48,10 +49,10 @@ jobs:
           perl \
           file
 
-    - name: build SDK
-      run: make preparation; make -j sdk_install_pkg
+    - name: Build SGX SDK (x64 install package = Linux)
+      run: make preparation; make sdk_install_pkg
 
-    - name: adjust output artifact nane and add provenance disclaimer
+    - name: Adjust output artifact name and add provenance disclaimer
       shell: bash
       run: |
         set -euo pipefail
@@ -77,7 +78,7 @@ jobs:
 
         echo "⚠️ This CI workflow is only smoke-testing the build pipeline. Artifact outputs are non-production-worthy." >> "$GITHUB_STEP_SUMMARY"
 
-    - name: upload the CI artifact (SDK installer)
+    - name: Upload the output artifact (SDK installer)
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: sdk_installer-ci-preview
