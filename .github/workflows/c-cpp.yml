@@ -55,7 +55,7 @@ jobs:
     - name: Simulate build (throwaway)
       run: |
          mkdir -p linux/installer/bin
-         echo "1" > linux/installer/bin/sgx_linuc_x64_sdk_1.2.3.4.bin
+         echo "1" > linux/installer/bin/sgx_linux_x64_sdk_1.2.3.4.bin
          
     - name: Adjust output artifact name and add provenance disclaimer
       shell: bash
