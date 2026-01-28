@@ -49,7 +49,7 @@ jobs:
           file
 
     - name: build SDK
-      run: make preparation; make sdk_install_pkg
+      run: make preparation; make -j sdk_install_pkg
 
     - name: adjust output artifact nane and add provenance disclaimer
       shell: bash
