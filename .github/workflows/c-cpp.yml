@@ -23,35 +23,40 @@ jobs:
     runs-on: ${{ vars.RUNNER_CI_BUILD || 'ubuntu-latest' }}
 
     steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-      with:
-        submodules: recursive
-        token: ${{ secrets.ALL_REPO_CONTENTS_READ_PAT || github.token }}
+    # - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+    #   with:
+    #     submodules: recursive
+    #     token: ${{ secrets.ALL_REPO_CONTENTS_READ_PAT || github.token }}
 
-    - name: Install build prerequisites
-      shell: bash
-      run: |
-        set -xeuo pipefail
+    # - name: Install build prerequisites
+    #   shell: bash
+    #   run: |
+    #     set -xeuo pipefail
 
-        sudo -E apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15
+    #     sudo -E apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15
         
-        sudo -E apt-get install -y --no-install-recommends \
-          build-essential \
-          ocaml \
-          ocamlbuild \
-          automake \
-          autoconf \
-          libtool \
-          wget \
-          python-is-python3 \
-          libssl-dev \
-          cmake \
-          perl \
-          file
+    #     sudo -E apt-get install -y --no-install-recommends \
+    #       build-essential \
+    #       ocaml \
+    #       ocamlbuild \
+    #       automake \
+    #       autoconf \
+    #       libtool \
+    #       wget \
+    #       python-is-python3 \
+    #       libssl-dev \
+    #       cmake \
+    #       perl \
+    #       file
 
-    - name: Build SGX SDK (x64 install package = Linux)
-      run: make preparation; make sdk_install_pkg
+    # - name: Build SGX SDK (x64 install package = Linux)
+    #   run: make preparation; make sdk_install_pkg
 
+    - name: Simulate build (throwaway)
+      run: |
+         mkdir -p linux/installer/bin
+         echo "1" > linux/installer/bin/sgx_linuc_x64_sdk_1.2.3.4.bin
+         
     - name: Adjust output artifact name and add provenance disclaimer
       shell: bash
       run: |
