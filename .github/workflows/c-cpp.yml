@@ -51,10 +51,38 @@ jobs:
     - name: build SDK
       run: make preparation; make sdk_install_pkg
 
-    - name: upload SDK installer
+    - name: adjust output artifact nane and add provenance disclaimer
+      shell: bash
+      run: |
+        set -euo pipefail
+        
+        SRC=$(ls -1 linux/installer/bin/sgx_linux_x64_sdk_*.bin | head -n 1)
+        [[ -n "${SRC:-}" ]] || { echo "No SDK installer found in build outputs"; exit 1; }
+
+        mv -v "$SRC" "${SRC%.bin}_ci-build-${GITHUB_RUN_ID}_NON-PROD.bin"
+
+        # Create a disclaimer with CI provenance information
+        {
+           echo "Produced by smoke-test CI build ${GITHUB_WORKFLOW_REF}."
+           echo "--------------"
+           echo "Run ID/Number: ${GITHUB_RUN_ID} / ${GITHUB_RUN_NUMBER}"
+           echo "Source Branch: ${GITHUB_REPOSITORY:-}/${GITHUB_REF_NAME:-unknown}"
+           echo "Commit SHA:    ${GITHUB_SHA}"
+           echo "--------------"
+           echo "Note:  This artifact is a product of a smoke-test CI build, not an official signed release."
+           echo "       Not for production use or external distribution."
+           echo "       Refer to https://download.01.org/intel-sgx/ for official SDK download information"
+           echo ""
+        } > linux/installer/bin/DISCLAIMER.txt
+
+        echo "⚠️ This CI workflow is only smoke-testing the build pipeline. Artifact outputs are non-production-worthy." >> "$GITHUB_STEP_SUMMARY"
+
+    - name: upload the CI artifact (SDK installer)
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: sdk_installer
-        path: linux/installer/bin/sgx_linux_x64_sdk_*.bin
+        name: sdk_installer-ci-preview
+        path: |
+           linux/installer/bin/sgx_linux_x64_sdk_*.bin
+           linux/installer/bin/DISCLAIMER.txt
         if-no-files-found: error
         retention-days: 3
