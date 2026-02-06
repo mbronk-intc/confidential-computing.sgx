@@ -56,8 +56,6 @@
 
 #define GET_WHITE_LIST_SIZE_MSEC (IPC_LATENCY)
 #define GET_WHITE_LIST_MSEC (IPC_LATENCY)
-#define SGX_GET_EXTENDED_GROUP_ID_MSEC (IPC_LATENCY)
-#define SGX_SWITCH_EXTENDED_GROUP_MSEC (IPC_LATENCY)
 #define REG_WL_CERT_CHAIN_MSEC (IPC_LATENCY)
 #define SE_CALC_QUOTE_SIZE_TIMEOUT_MSEC (IPC_LATENCY)
 #define SE_SELECT_ATT_KEY_ID_TIMEOUT_MSEC (IPC_LATENCY)
@@ -284,10 +282,10 @@ sgx_status_t sgx_init_quote_ex(const sgx_att_key_id_t* p_att_key_id,
             case AESM_NO_PLATFORM_CERT_DATA:
                 mapped = SGX_ERROR_PLATFORM_CERT_UNAVAILABLE;
                 break;
-            case AESM_EPIDBLOB_ERROR:
+            case AESM_EPIDBLOB_ERROR: /* DEPRECATED - EPID-based functionality is no longer supported (removed in v2.28) */
                 mapped = SGX_ERROR_AE_INVALID_EPIDBLOB;
                 break;
-            case AESM_EPID_REVOKED_ERROR:
+            case AESM_EPID_REVOKED_ERROR: /* DEPRECATED - EPID-based functionality is no longer supported (removed in v2.28) */
                 mapped = SGX_ERROR_EPID_MEMBER_REVOKED;
                 break;
             case AESM_BACKEND_SERVER_BUSY:

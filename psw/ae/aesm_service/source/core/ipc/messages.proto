@@ -143,15 +143,6 @@ message Response{
         optional   bytes  white_list = 2;
     }
 
-    message SGXGetExtendedEpidGroupIdResponse{
-        required   uint32 errorCode = 1 [default = 1];
-        optional   uint32 x_group_id = 2;
-    }
-
-    message SGXSwitchExtendedEpidGroupResponse{
-        required   uint32 errorCode = 1 [ default = 1];
-    }
-
     message SGXRegisterResponse{
         required   uint32 errorCode = 1 [ default = 1];
     }
@@ -199,8 +190,6 @@ message Response{
     optional    ReportAttestationErrorResponse reportErrRes = 4;
     optional    GetWhiteListSizeResponse getWhiteListSizeRes = 10;
     optional    GetWhiteListResponse getWhiteListRes        = 11;
-    optional    SGXGetExtendedEpidGroupIdResponse sgxGetExtendedEpidGroupIdRes = 12;
-    optional    SGXSwitchExtendedEpidGroupResponse sgxSwitchExtendedEpidGroupRes = 13;
     optional    SGXRegisterResponse sgxRegisterRes          = 14;
     optional    InitQuoteExResponse initQuoteExRes          = 15;
     optional    GetQuoteSizeExResponse getQuoteSizeExRes    = 16;

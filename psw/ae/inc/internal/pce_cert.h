@@ -42,6 +42,7 @@ const uint16_t CUR_PCE_ID = 0;
 /*signature_scheme*/
 #define NIST_P256_ECDSA_SHA256 0
 
+#define PEK_MOD_SIZE 384
 
 /*type for Platform Certificate Enclave information*/
 typedef struct _pce_info_t{
@@ -49,9 +50,17 @@ typedef struct _pce_info_t{
     uint16_t      pce_id;
 }pce_info_t;
 
+#pragma pack(push, 1)
+/*Make sure the alignment of all of them is 1 since they'll be used in an unaligned buffer type for Platform Provisioning Identifier*/
+typedef struct _ppid_t{
+    uint8_t ppid[16];
+}ppid_t;
+
 typedef struct _psvn_t{
     sgx_cpu_svn_t    cpu_svn;
     sgx_isv_svn_t    isv_svn; /*PvE/QE SVN*/
 }psvn_t;
+
+
 
 #endif
