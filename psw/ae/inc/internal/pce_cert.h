@@ -52,6 +52,7 @@ typedef struct _pce_info_t{
 
 #pragma pack(push, 1)
 /*Make sure the alignment of all of them is 1 since they'll be used in an unaligned buffer type for Platform Provisioning Identifier*/
+
 typedef struct _ppid_t{
     uint8_t ppid[16];
 }ppid_t;
@@ -61,6 +62,6 @@ typedef struct _psvn_t{
     sgx_isv_svn_t    isv_svn; /*PvE/QE SVN*/
 }psvn_t;
 
-
+#pragma pack(pop)
 
 #endif
